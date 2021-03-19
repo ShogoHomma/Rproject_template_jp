@@ -87,5 +87,10 @@ output_path <- here("Output", "Figures")
 
 
 
+# SessionInfo
+
+```{r}
+sessionInfo()
+```
 
 
