@@ -1,0 +1,91 @@
+---
+title: "Rproject_template"
+author: "Author"
+date: "`r format(Sys.time(), '%Y/%m/%d')`"
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    theme: spacelab
+    highlight: haddock
+    fig_caption: yes
+    fig_width: 9
+    fig_height: 8
+    self_contained: true
+    #css: mystyle.css
+    md_extensions: -ascii_identifiers
+---
+
+# セットアップ
+
+## ライブラリーの読み込み
+
+```{r setup-load-library, results='hide'}
+library(tidyverse) # recommend # see https://heavywatal.github.io/rstats/programming.html
+library(here) # recommend # see https://uribo.hatenablog.com/entry/2018/01/25/082000
+library(patchwork) # recommend # see https://qiita.com/nozma/items/4512623bea296ccb74ba
+```
+
+
+## 関数の読み込み
+
+```{r setup-load-functions, results='hide'}
+# プロジェクトで共通で使う関数は、_functionsフォルダに作成して、source()で読み込むこと
+functions_path <- here("Analysis_Script", "_functions")
+target_functions <- here(functions_path, dir(functions_path))
+
+source(target_functions)
+```
+
+
+## メタ情報の設定
+
+```{r setup-knit-environment, results='hide'}
+# knit時の各種設定
+# 特に、cacheを _cacheフォルダに生成するための設定
+
+rmarkdown_dir <- "Analysis_Script"
+cache_dir <- "_cache" # cacheの保存ディレクトリ名
+input <- knitr::current_input() %>% str_split(pattern = "\\.Rmd") # 拡張子の前だけ取り出す
+
+knitr::opts_chunk$set(
+  echo=TRUE, comment="", warning=FALSE, message=FALSE, fig.align="center",
+  
+  cache.path = here(rmarkdown_dir, cache_dir, input[[1]][1] %&% "_cache", "html") %&% "/", 
+  fig.path = here(rmarkdown_dir, cache_dir, input[[1]][1] %&% "_files", "figure-html") %&% "/"
+  )
+```
+
+```{r setup-output-path}
+# 出力の保存先のパスを設定
+# dir.create(here("Output", "Figures")) # なければ、フォルダを作成
+output_path <- here("Output", "Figures")
+```
+
+
+## データの読み込み
+
+```{r}
+# Note: 初めてこのフォルダを使用する場合には、事前に
+## Simulation_Code/generate_DummyData_RL.R
+## Simulatuon_Code/generate_DummyData_RL.py
+# のどちらかを実行する → Data/DummyData/にcsvや.RDataが生成される
+
+
+```
+
+
+# 概要
+
+これまでの分析の要約、今回の分析の目的、どんな分析をやったのかの要約を列挙する
+
+
+# 分析1：XXX
+
+
+
+
+
+
