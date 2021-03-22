@@ -36,7 +36,9 @@ library(patchwork) # recommend # see https://qiita.com/nozma/items/4512623bea296
 functions_path <- here("Analysis_Script", "_functions")
 target_functions <- here(functions_path, dir(functions_path))
 
-source(target_functions)
+purrr::walk(target_functions, ~source(.x))
+# source()は複数の関数を読み込めないので、purrr::walk()を使う
+# purrr::walk()は、vector (or list) を関数に適用しながらinvisible返しする、purrr::mapの亜種
 ```
 
 
@@ -68,12 +70,21 @@ output_path <- here("Output", "Figures")
 ## データの読み込み
 
 ```{r}
-# Note: 初めてこのフォルダを使用する場合には、事前に
-## Simulation_Code/generate_DummyData_RL.R
-## Simulatuon_Code/generate_DummyData_RL.py
-# のどちらかを実行する → Data/DummyData/にcsvや.RDataが生成される
+# --- load data --- #
+# デフォルトで、Data/DummyData_RL/に3つのダミーデータのディレクトリがあるはず
+# テストとして、それらを読み込んでデータフレームにする
+## ディレクトリがなければ、generate_DummyData_RL.R or generate_DummyData_RL.py のどちらかを実行してcsvを生成しておく
+# --- --- #
 
+options(readr.num_columns = 0) # readrのメッセージがうるさいので消す
 
+DataDir <- "Data"
+DataDir_sub <- "DummyData_RL"
+
+target_csv <- make_CSVPath(DataDir, DataDir_sub, ".", ".csv")
+df_dummy_RL <- purrr::map_dfr(target_csv, readr::read_csv)
+# 複数のcsv（列構造が同じもの）は、purrr::map_dfr()がrapid & beautifulで良い
+# csvが巨大な場合には、purrr::map_dfr(target_csv, data.table::fread)を実行すると良い
 ```
 
 
@@ -82,8 +93,34 @@ output_path <- here("Output", "Figures")
 これまでの分析の要約、今回の分析の目的、どんな分析をやったのかの要約を列挙する
 
 
-# 分析1：XXX
+# 分析1：試行を通してのQ値と選択の変化
 
+```{r}
+# --- 作図の基本的な方針 --- #
+## 横軸や縦軸などのパラメータが同じで、与えるデータフレームだけが異なる場合は、
+## 作図を関数化して、purrr::mapで作成する
+## or %+% でデータだけ置き換えることで作成する
+## なるべく ggsave()でpng保存する ← 論文や学会スライドの際にすぐ利用できるように
+## Figureの保存先は、Output/Figures/
+# --- --- --- #
+
+
+
+
+```
+
+
+## 報酬確率0.6 vs 0.4
+
+## 
+
+
+
+## 
+
+
+
+# 分析2：
 
 
 
