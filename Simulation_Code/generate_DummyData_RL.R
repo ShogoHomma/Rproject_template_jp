@@ -1,6 +1,7 @@
 # 単純な強化学習のシミュレーション
 
 library(tidyverse)
+library(here)
 
 ## ------- データ保存の関数 -------
 
@@ -28,7 +29,7 @@ writeToCSV <- function(output_df, sbj_params_set, task_params_set) {
   
   # csvへ保存
   output_df %>% 
-    readr::write_csv(path = here(sim_output_path, "RL_trial.csv"))
+    readr::write_csv(file = here(sim_output_path, "RL_trial.csv"))
   
 }
 
@@ -83,7 +84,7 @@ for (agent_i in 1:nrow(sbj_params_set)) {
     ## choice
     Prob_Choices[agent_i, trial_i] <- 1 / (1 + exp(-beta_i*( Qvalues[agent_i, trial_i, 1] - Qvalues[agent_i, trial_i, 2] )))
     
-    Choices[agent_i, trial_i] <- as.integer(rbernoulli(n = 1, p = Prob_Choices[agent_i, trial_i]))[1]
+    Choices[agent_i, trial_i] <- rbinom(n = 1, size = 1, prob = Prob_Choices[agent_i, trial_i])
     
     if (Choices[agent_i, trial_i] == 0) {
       Choices[agent_i, trial_i] <- 2 # convert choice 0 -> choice 2
@@ -92,11 +93,11 @@ for (agent_i in 1:nrow(sbj_params_set)) {
     ## get reward
     if (Choices[agent_i, trial_i] == 1) {
       
-      Rewards[agent_i, trial_i] <- as.integer(rbernoulli(n = 1, p = Option1_p_reward))
+      Rewards[agent_i, trial_i] <- rbinom(n = 1, size = 1, prob = Option1_p_reward)
       
     } else if (Choices[agent_i, trial_i] == 2) {
       
-      Rewards[agent_i, trial_i] <- as.integer(rbernoulli(n = 1, p = Option2_p_reward))
+      Rewards[agent_i, trial_i] <- rbinom(n = 1, size = 1, prob = Option2_p_reward)
       
     } else {
       
