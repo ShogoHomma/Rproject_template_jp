@@ -4,7 +4,7 @@ author: "Author"
 date: "`r format(Sys.time(), '%Y/%m/%d')`"
 output: 
   html_document:
-    code_folding: hide
+    code_folding: show
     toc: true
     toc_float: true
     toc_depth: 2
@@ -28,7 +28,6 @@ library(here) # recommend # see https://uribo.hatenablog.com/entry/2018/01/25/08
 library(patchwork) # recommend # see https://qiita.com/nozma/items/4512623bea296ccb74ba
 ```
 
-
 ## 関数の読み込み
 
 ```{r setup-load-functions, results='hide'}
@@ -39,14 +38,21 @@ target_functions <- here(functions_path, dir(functions_path))
 purrr::walk(target_functions, ~source(.x))
 # source()は複数の関数を読み込めないので、purrr::walk()を使う
 # purrr::walk()は、vector (or list) を関数に適用しながらinvisible返しする、purrr::mapの亜種
-```
 
+
+my_theme1 <- theme_classic(base_size=25) + theme(axis.text.y=element_text(colour="black"), axis.text.x=element_text(colour="black"), axis.line=element_line(colour="black", size=1.7, lineend="square"))
+
+my_theme2 <- theme_bw(base_size=25) + theme(axis.text.y=element_text(colour="black"), axis.text.x=element_text(colour="black"), axis.line=element_line(colour="black", size=1.7, lineend="square"))
+
+my_theme3 <- theme_minimal(base_size=25) + theme(axis.text.y=element_text(colour="black"), axis.text.x=element_text(colour="black"), axis.line=element_line(colour="black", size=1.7, lineend="square"))
+```
 
 ## メタ情報の設定
 
 ```{r setup-knit-environment, results='hide'}
 # knit時の各種設定
 # 特に、cacheを _cacheフォルダに生成するための設定
+# このchunkは手動でrunしないこと。エラーが出る。
 
 rmarkdown_dir <- "Analysis_Script"
 cache_dir <- "_cache" # cacheの保存ディレクトリ名
@@ -62,19 +68,33 @@ knitr::opts_chunk$set(
 
 ```{r setup-output-path}
 # 出力の保存先のパスを設定
-# dir.create(here("Output", "Figures")) # なければ、フォルダを作成
-output_path <- here("Output", "Figures")
+# dir.create(here("Output", "Figures_DummyData")) # なければ、フォルダを作成
+output_path <- here("Output", "Figures_DummyData")
 ```
-
 
 ## データの読み込み
 
+
+データ読み込みの基本的な方針 
+
+- このRmarkdown内で使用するデータは、なるべくこのセクション内で全て読み込み、データフレームとして保存しておくこと
+- もしRawDataが整理されていない場合には、データを加工したものをcsvファイルとして./Data/に別途保存し、それを読み込み直すのが良い。この場合には、別のRスクリプトで加工用ファイルを用意する方がきれいになる（Rmarkdownでやらない方が良い）。
+- 2種類以上のデータ分析を行い、それぞれ全く別のデータフレームが分析対象となるとしても、このセクションでまとめて読み込み、別々のデータフレームとして保存しておくのが良い。
+
+    - あまりおすすめしない方法：分析1の直前に分析1で使用するデータを読み込み、分析2の直前に分析2で使用するデータを読みこむ。
+    - 理由：ここら辺は好みにもよるが、あとで見返した時にデータフレームの読み込みがどこで行われたがわかりにくくなりがち。
+    - ただし、あまりにもデータ量が多いため、複数のオブジェクトを保持したくない、という場合もある（毎回同じオブジェクト名を使用して、中身だけ更新したい）。これはケースバイケースで対応する。
+    
+
+  
+※ 分析の際には、上記の文章を削除すること
+
+  
 ```{r}
-# --- load data --- #
-# デフォルトで、Data/DummyData_RL/に3つのダミーデータのディレクトリがあるはず
-# テストとして、それらを読み込んでデータフレームにする
-## ディレクトリがなければ、generate_DummyData_RL.R or generate_DummyData_RL.py のどちらかを実行してcsvを生成しておく
-# --- --- #
+# --- 読み取りの例 --- # 
+# デフォルトで、Data/DummyData_RL/に3つのダミーデータのディレクトリがあるはず。  
+# テストとして、それらを読み込んでデータフレームにする。  
+# ディレクトリがなければ、generate_DummyData_RL.R or generate_DummyData_RL.py のどちらかを実行してcsvを生成しておく。
 
 options(readr.num_columns = 0) # readrのメッセージがうるさいので消す
 
@@ -87,37 +107,172 @@ df_dummy_RL <- purrr::map_dfr(target_csv, readr::read_csv)
 # csvが巨大な場合には、purrr::map_dfr(target_csv, data.table::fread)を実行すると良い
 ```
 
-
 # 概要
 
 これまでの分析の要約、今回の分析の目的、どんな分析をやったのかの要約を列挙する
 
-
 # 分析1：試行を通してのQ値と選択の変化
 
-```{r}
-# --- 作図の基本的な方針 --- #
-## 横軸や縦軸などのパラメータが同じで、与えるデータフレームだけが異なる場合は、
-## 作図を関数化して、purrr::mapで作成する
-## or %+% でデータだけ置き換えることで作成する
-## なるべく ggsave()でpng保存する ← 論文や学会スライドの際にすぐ利用できるように
-## Figureの保存先は、Output/Figures/
-# --- --- --- #
+## 画像の作成
+  
+
+作図の基本的な方針  
+
+- 横軸や縦軸などのパラメータが同じで、与えるデータフレームだけが異なる場合は、作図を関数化して、purrr::map()でまとめて作成する。または、 %+% でデータだけ置き換えることで作成する。
+- 論文や学会スライドの際にすぐ利用できるように、なるべくggsave()でpng形式で保存しておく。ファイル名には一定の規則を設けて出力する。  
+- Figureの保存先は、メタ情報の設定：setup-output-pathチャンクで指定済み。
 
 
 
+※ 分析の際には、上記の文章を削除すること
 
+```{r, code = readLines(here("Analysis_Script", "_functions", "plot_TrialQvalue.R"))}
 ```
+
+  
+```{r, eval=FALSE}
+# 横軸：試行、縦軸：Q値
+
+#dir.create(here(output_path, "Qvalue"))
+
+## 課題ごと（報酬確率が異なる）、facetで行：beta, 列：alphaにする
+
+task_sort <- c("Op0.6", "Op0.7", "Op0.8")
+
+df_dummy_RL %>% 
+  tidyr::pivot_longer(cols = c(Q1, Q2), names_to = "Q", values_to = "value") %>% 
+  dplyr::mutate(
+    beta_c = "beta = " %&% beta,
+    alpha_c = "alpha = " %&% alpha,
+  ) %>% 
+  dplyr::group_split(Op1_p) -> 
+  df_dummy_RL_list 
+
+# 画像の作成
+g <- purrr::map(df_dummy_RL_list, 
+                ~{p <- plot_TrialQvalue(.x); 
+                  p + facet_grid(beta_c ~ alpha_c)})
+
+# 画像の保存
+purrr::walk2(task_sort, g, 
+             ~ggsave(filename = here(output_path, "Qvalue", "Qvalue_full_" %&% .x %&% ".png"),
+                     plot = .y, height = 16, width = 18))
+
+## 課題ごと（報酬確率が異なる）、IDごと（パラメータが異なる）に分割してlistにし、purrr::map()でまとめて画像を生成
+
+df_dummy_RL %>% 
+  tidyr::pivot_longer(cols = c(Q1, Q2), names_to = "Q", values_to = "value") %>% 
+  dplyr::group_split(Op1_p, ID) ->
+  df_dummy_RL_list
+
+IDs <- 1:25
+plot_params <- # 保存用のdf
+  tibble(
+    task = task_sort
+  ) %>% 
+  tidyr::crossing(ID = IDs) %>% 
+  dplyr::mutate(
+    alpha = df_dummy_RL_list %>% purrr::map("alpha") %>% purrr::map_dbl(1),
+    beta = df_dummy_RL_list %>% purrr::map("beta") %>% purrr::map_dbl(1)
+  )
+  
+# 画像の作成
+g <- purrr::map(1:nrow(plot_params), 
+                ~plot_TrialQvalue(df = df_dummy_RL_list[[.x]]))
+
+# 画像の保存
+purrr::walk2(1:nrow(plot_params), g, 
+             ~{save_name <- "Qvalue_task" %&% plot_params[.x,]$task %&% "_ID" %&% plot_params[.x,]$ID %&% "_alpha" %&% plot_params[.x,]$alpha %&% "_beta" %&% plot_params[.x,]$beta %&% ".png"; 
+             ggsave(filename = here(output_path, "Qvalue", save_name),
+                     plot = .y, height = 6, width = 8)})
+```
+
+
+```{r, code = readLines(here("Analysis_Script", "_functions", "plot_TrialProb.R"))}
+```
+
+
+```{r, eval=FALSE}
+# 横軸：試行、縦軸：p値と選択
+
+dir.create(here(output_path, "CProb"))
+
+## 課題ごと（報酬確率が異なる）、facetで行：beta, 列：alphaにする
+
+task_sort <- c("Op0.6", "Op0.7", "Op0.8")
+
+df_dummy_RL %>% 
+  dplyr::mutate(
+    beta_c = "beta = " %&% beta,
+    alpha_c = "alpha = " %&% alpha,
+  ) %>% 
+  dplyr::group_split(Op1_p) -> 
+  df_dummy_RL_list 
+
+# 画像の作成
+g <- purrr::map(df_dummy_RL_list, 
+                ~{p <- plot_TrialProb(.x); 
+                  p + facet_grid(beta_c ~ alpha_c)})
+
+# 画像の保存
+purrr::walk2(task_sort, g, 
+             ~ggsave(filename = here(output_path, "CProb", "CProb_full_" %&% .x %&% ".png"),
+                     plot = .y, height = 16, width = 18))
+
+## 課題ごと（報酬確率が異なる）、IDごと（パラメータが異なる）に分割してlistにし、purrr::map()でまとめて画像を生成
+
+df_dummy_RL %>% 
+  dplyr::group_split(Op1_p, ID) ->
+  df_dummy_RL_list
+
+IDs <- 1:25
+plot_params <- # 保存用のdf
+  tibble(
+    task = task_sort
+  ) %>% 
+  tidyr::crossing(ID = IDs) %>% 
+  dplyr::mutate(
+    alpha = df_dummy_RL_list %>% purrr::map("alpha") %>% purrr::map_dbl(1),
+    beta = df_dummy_RL_list %>% purrr::map("beta") %>% purrr::map_dbl(1)
+  )
+  
+# 画像の作成
+g <- purrr::map(1:nrow(plot_params), 
+                ~plot_TrialProb(df = df_dummy_RL_list[[.x]]))
+
+# 画像の保存
+purrr::walk2(1:nrow(plot_params), g, 
+             ~{save_name <- "CProb_task" %&% plot_params[.x,]$task %&% "_ID" %&% plot_params[.x,]$ID %&% "_alpha" %&% plot_params[.x,]$alpha %&% "_beta" %&% plot_params[.x,]$beta %&% ".png"; 
+             ggsave(filename = here(output_path, "CProb", save_name),
+                     plot = .y, height = 6, width = 8)})
+```
+
+
+## 報酬確率0.8 vs 0.2
+
+![](`r here(output_path, "Qvalue", "Qvalue_full_Op0.8.png")`)
+
+
+
+![](`r here(output_path, "CProb", "CProb_full_Op0.8.png")`)
+
+
+## 報酬確率0.7 vs 0.3
+
+
+![](`r here(output_path, "Qvalue", "Qvalue_full_Op0.7.png")`)
+
+
+![](`r here(output_path, "CProb", "CProb_full_Op0.7.png")`)
 
 
 ## 報酬確率0.6 vs 0.4
 
-## 
+
+![](`r here(output_path, "Qvalue", "Qvalue_full_Op0.6.png")`)
 
 
-
-## 
-
+![](`r here(output_path, "CProb", "CProb_full_Op0.6.png")`)
 
 
 # 分析2：
@@ -129,5 +284,3 @@ df_dummy_RL <- purrr::map_dfr(target_csv, readr::read_csv)
 ```{r}
 sessionInfo()
 ```
-
-
