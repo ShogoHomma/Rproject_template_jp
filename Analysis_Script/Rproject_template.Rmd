@@ -56,13 +56,13 @@ my_theme3 <- theme_minimal(base_size=25) + theme(axis.text.y=element_text(colour
 
 rmarkdown_dir <- "Analysis_Script"
 cache_dir <- "_cache" # cacheの保存ディレクトリ名
-input <- knitr::current_input() %>% str_split(pattern = "\\.Rmd") # 拡張子の前だけ取り出す
+input <- knitr::current_input() %>% str_split(pattern = "\\.Rmd") %>% .[[1]] %>% .[1] # 拡張子の前だけ取り出す # 返り値がリストになっているのでその中身を取り出す
 
 knitr::opts_chunk$set(
   echo=TRUE, comment="", warning=FALSE, message=FALSE, fig.align="center",
   
-  cache.path = here(rmarkdown_dir, cache_dir, input[[1]][1] %&% "_cache", "html") %&% "/", 
-  fig.path = here(rmarkdown_dir, cache_dir, input[[1]][1] %&% "_files", "figure-html") %&% "/"
+  cache.path = here(rmarkdown_dir, cache_dir, input %&% "_cache", "html") %&% "/", 
+  fig.path = here(rmarkdown_dir, cache_dir, input %&% "_files", "figure-html") %&% "/"
   )
 ```
 
