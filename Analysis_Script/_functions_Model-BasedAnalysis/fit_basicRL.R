@@ -1,8 +1,8 @@
 # 単純なQ学習モデルをフィッティングする
 
-library(tidyverse)
-library(rstan)
-library(here) 
+#library(tidyverse)
+#library(rstan)
+#library(here) 
 
 fit_basicRL <- function(data_path, stan_model, save_path, stan_set) {
   
