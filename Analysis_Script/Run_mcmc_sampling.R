@@ -25,10 +25,10 @@ stan_name <- "basic_RL.stan"
 fit_number <- "fit01"
 
 # ファイルの保存先を作成 & 取得
-save_path <- output_setup(output_path, stan_name, fit_number) 
+save_path <- output_setup(output_path, stan_name, "stanfit", fit_number) 
 
 # データパスの取得
-target_data <- make_CSVPath("Data", "DummyData_RL", "_20210322151628", ".csv")
+target_data <- make_DataPath("Data", "DummyData_RL", "_20210322151628", ".csv")
 
 # コンパイル & MCMCの実行
 
