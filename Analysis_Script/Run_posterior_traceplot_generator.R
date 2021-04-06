@@ -29,9 +29,6 @@ stanfit_pattern <- "stanfit.obj"
 save_path_posterior <- output_setup(output_path, stan_name, "posterior", fit_number)
 save_path_traceplot <- output_setup(output_path, stan_name, "traceplot", fit_number)
 
-# データパスの取得
-target_data <- make_DataPath("Data", "DummyData_RL", "_20210322151628", ".csv")
-
 # stan.objのパスの取得
 target_stanfit <- make_DataPath(output_path, "basic_RL", "fit01", stanfit_pattern)
 
