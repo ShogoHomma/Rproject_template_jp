@@ -3,7 +3,7 @@
 #library(tidyverse)
 #library(here)
 
-params_csv_basicRL <- function(target_stanfit, save_path, output_csv_name) {
+save_params_csv_basicRL <- function(target_stanfit, save_path, output_csv_name) {
   
   stan_df <- stan_to_df(target_stanfit) %>% 
     as_tibble() # 一応tibble化しておく
