@@ -2,7 +2,7 @@
 ## Dir：プロジェクトディレクトリの直下にある、焦点のディレクトリ
 ## Dir_sub：もう1つ下のディレクトリ
 
-library(here)
+#library(here)
 
 make_DataPath <- function(Dir, Dir_sub, dir_pattern, csv_pattern) {
   
