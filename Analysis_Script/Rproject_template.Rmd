@@ -31,20 +31,17 @@ library(patchwork) # recommend # see https://qiita.com/nozma/items/4512623bea296
 ## 関数の読み込み
 
 ```{r setup-load-functions, results='hide'}
-# プロジェクトで共通で使う関数は、_functionsフォルダに作成して、source()で読み込むこと
-functions_path <- here("Analysis_Script", "_functions")
-target_functions <- here(functions_path, dir(functions_path))
+# よく使う関数は、_functions_commonフォルダに作成
+# プロジェクトで使う関数は、_functions_projectフォルダに作成し、source()で読み込むこと
+common_functions_path <- here("Analysis_Script", "_functions_common")
+common_functions <- here(common_functions_path, dir(common_functions_path))
+purrr::walk(common_functions, ~source(.x))
 
-purrr::walk(target_functions, ~source(.x))
+project_functions_path <- here("Analysis_Script", "_functions_project")
+project_functions <- here(project_functions_path, dir(project_functions_path))
+purrr::walk(project_functions, ~source(.x))
 # source()は複数の関数を読み込めないので、purrr::walk()を使う
 # purrr::walk()は、vector (or list) を関数に適用しながらinvisible返しする、purrr::mapの亜種
-
-
-my_theme1 <- theme_classic(base_size=25) + theme(axis.text.y=element_text(colour="black"), axis.text.x=element_text(colour="black"), axis.line=element_line(colour="black", size=1.7, lineend="square"))
-
-my_theme2 <- theme_bw(base_size=25) + theme(axis.text.y=element_text(colour="black"), axis.text.x=element_text(colour="black"), axis.line=element_line(colour="black", size=1.7, lineend="square"))
-
-my_theme3 <- theme_minimal(base_size=25) + theme(axis.text.y=element_text(colour="black"), axis.text.x=element_text(colour="black"), axis.line=element_line(colour="black", size=1.7, lineend="square"))
 ```
 
 ## メタ情報の設定
@@ -78,7 +75,7 @@ output_path <- here("Output", "Figures_DummyData")
 データ読み込みの基本的な方針 
 
 - このRmarkdown内で使用するデータは、なるべくこのセクション内で全て読み込み、データフレームとして保存しておくこと
-- もしRawDataが整理されていない場合には、データを加工したものをcsvファイルとして./Data/に別途保存し、それを読み込み直すのが良い。この場合には、別のRスクリプトで加工用ファイルを用意する方がきれいになる（Rmarkdownでやらない方が良い）。
+- もしRawDataがあまり整理されていない場合には、整形用のRスクリプトを別途用意して、Rの中でデータを整形すること。そして、その結果を新しいcsvファイルとして ./Data/に保存し、それを読み込み直すのが良い。整形コードは、Rmarkdownに書かない方が良い。
 - 2種類以上のデータ分析を行い、それぞれ全く別のデータフレームが分析対象となるとしても、このセクションでまとめて読み込み、別々のデータフレームとして保存しておくのが良い。
 
     - あまりおすすめしない方法：分析1の直前に分析1で使用するデータを読み込み、分析2の直前に分析2で使用するデータを読みこむ。
@@ -101,11 +98,28 @@ options(readr.num_columns = 0) # readrのメッセージがうるさいので消
 DataDir <- "Data"
 DataDir_sub <- "DummyData_RL"
 
-target_csv <- make_CSVPath(DataDir, DataDir_sub, ".", ".csv")
+target_csv <- make_DataPath(DataDir, DataDir_sub, ".", ".csv")
 df_dummy_RL <- purrr::map_dfr(target_csv, readr::read_csv)
 # 複数のcsv（列構造が同じもの）は、purrr::map_dfr()がrapid & beautifulで良い
 # csvが巨大な場合には、purrr::map_dfr(target_csv, data.table::fread)を実行すると良い
 ```
+
+
+```{r}
+options(readr.num_columns = 0) # readrのメッセージがうるさいので消す
+
+df_est_params <- readr::read_csv(here("Data", "Models_Results", "basic_RL", "fit01", "estimated_parameter", "est_parameter.csv")) %>% 
+  dplyr::rename(
+    ID = p_index
+  ) %>% 
+  dplyr::filter(para %in% c("alpha", "beta")) %>% 
+  tidyr::pivot_wider(id_cols = c("ID"), names_from = para, values_from = mean) %>% 
+  dplyr::rename(
+    fit_alpha = alpha,
+    fit_beta = beta
+  )
+```
+
 
 # 概要
 
@@ -253,7 +267,6 @@ purrr::walk2(1:nrow(plot_params), g,
 ![](`r here(output_path, "Qvalue", "Qvalue_full_Op0.8.png")`)
 
 
-
 ![](`r here(output_path, "CProb", "CProb_full_Op0.8.png")`)
 
 
@@ -275,8 +288,37 @@ purrr::walk2(1:nrow(plot_params), g,
 ![](`r here(output_path, "CProb", "CProb_full_Op0.6.png")`)
 
 
-# 分析2：
+# 分析2：パラメータの推定結果と真値の相関
 
+- 横軸：シミュレーション時のパラメータの値
+- 縦軸：推定したパラメータの値（平均値）
+
+```{r}
+# データの処理
+df_dummy_RL %>% 
+  dplyr::filter(Op1_p == 0.8) %>% 
+  dplyr::filter(trial == 1) %>% 
+  dplyr::transmute(
+    ID = ID,
+    sim_alpha = alpha,
+    sim_beta = beta
+  ) %>% 
+  dplyr::full_join(df_est_params, by = "ID") -> 
+  df_sim_fit
+```
+
+```{r}
+df_sim_fit %>% 
+  ggplot(aes(x = sim_alpha, y = fit_alpha)) + 
+  geom_point() + geom_abline(slope = 1, intercept = 0) + 
+  coord_cartesian(xlim = c(0,1), ylim = c(0,1))
+```
+
+```{r}
+df_sim_fit %>% 
+  ggplot(aes(x = sim_beta, y = fit_beta)) + 
+  geom_point() + geom_abline(slope = 1, intercept = 0)
+```
 
 
 # SessionInfo
