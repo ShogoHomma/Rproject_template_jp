@@ -5,11 +5,11 @@ library(rstan)
 library(here) 
 
 # 関数の読み込み
-model_functions_path <- here("Analysis_Script", "_functions_Model-BasedAnalysis")
+model_functions_path <- here("Analysis_Script", "_functions_ModelBasedAnalysis")
 model_functions <- here(model_functions_path, dir(model_functions_path))
 purrr::walk(model_functions, ~source(.x))
 
-common_functions_path <- here("Analysis_Script", "_functions")
+common_functions_path <- here("Analysis_Script", "_functions_common")
 common_functions <- here(common_functions_path, dir(common_functions_path))
 purrr::walk(common_functions, ~source(.x))
 
