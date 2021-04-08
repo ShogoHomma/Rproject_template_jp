@@ -2,7 +2,6 @@
 
 #library(tidyverse)
 #library(here)
-source(here("Analysis_Script", "_functions", "map_value.R"))
 
 stan_to_df <- function(file) {
   
