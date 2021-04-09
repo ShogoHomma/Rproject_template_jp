@@ -1,4 +1,4 @@
-# stanをコンパイルし、mcmcを実行するファイル
+# stanオブジェクトを読み込み、事後分布とトレースプロットをpngで出力&保存するファイル
 
 library(tidyverse)
 library(rstan)
@@ -13,7 +13,7 @@ common_functions_path <- here("Analysis_Script", "_functions_common")
 common_functions <- here(common_functions_path, dir(common_functions_path))
 purrr::walk(common_functions, ~source(.x))
 
-# 結果の出力先
+# 出力の保存先
 output_path <- here("Data", "Models_Results")
 
 
@@ -25,7 +25,7 @@ stan_name <- "basic_RL"
 fit_number <- "fit01"
 stanfit_pattern <- "stanfit.obj"
 
-# ファイルの保存先を作成 & 取得
+# 出力の保存先を作成 & 取得
 save_path_posterior <- output_setup(output_path, stan_name, "posterior", fit_number)
 save_path_traceplot <- output_setup(output_path, stan_name, "traceplot", fit_number)
 

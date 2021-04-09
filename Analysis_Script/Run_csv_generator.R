@@ -1,4 +1,5 @@
-# stanをコンパイルし、mcmcを実行するファイル
+# stanオブジェクトを読み込んで、推定結果のサマリーをcsvで保存するファイル
+# 推定結果は、summary(fit)$summary で出力されるもの
 
 library(tidyverse)
 library(rstan)
@@ -13,7 +14,7 @@ common_functions_path <- here("Analysis_Script", "_functions_common")
 common_functions <- here(common_functions_path, dir(common_functions_path))
 purrr::walk(common_functions, ~source(.x))
 
-# 結果の出力先
+# 出力の保存先
 output_path <- here("Data", "Models_Results")
 
 
@@ -26,7 +27,7 @@ fit_number <- "fit01"
 stanfit_pattern <- "stanfit.obj"
 output_csv_name <- "est_parameter.csv"
 
-# ファイルの保存先を作成 & 取得
+# 出力の保存先を作成 & 取得
 save_path <- output_setup(output_path, stan_name, "estimated_parameter", fit_number) 
 
 # stan.objのパスを取得
