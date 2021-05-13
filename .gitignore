@@ -6,3 +6,5 @@
 # Outputフォルダは空にする
 /Output/*
 !/Output/.gitkeep
+# rmarkdownの_cacheフォルダを無視する
+_cache/
