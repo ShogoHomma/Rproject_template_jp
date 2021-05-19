@@ -1,0 +1,22 @@
+Generation: 50
+N_pop: 100
+N_sub_pop: 4
+N_group: 25
+Cost: 1
+Benefit: 2
+Mutation_rate: 0.01
+Init_rate_C: 0.9
+
+
+start: 2021-05-19 19:38:55.615791
+
+generation_i: 4, end time: 2021-05-19 19:38:55.690451, elapsed time: 0:00:00.074660
+generation_i: 9, end time: 2021-05-19 19:38:55.728039, elapsed time: 0:00:00.037588
+generation_i: 14, end time: 2021-05-19 19:38:55.762853, elapsed time: 0:00:00.034814
+generation_i: 19, end time: 2021-05-19 19:38:55.818461, elapsed time: 0:00:00.055608
+generation_i: 24, end time: 2021-05-19 19:38:55.859921, elapsed time: 0:00:00.041460
+generation_i: 29, end time: 2021-05-19 19:38:55.893141, elapsed time: 0:00:00.033220
+generation_i: 34, end time: 2021-05-19 19:38:55.940834, elapsed time: 0:00:00.047693
+generation_i: 39, end time: 2021-05-19 19:38:55.976500, elapsed time: 0:00:00.035666
+generation_i: 44, end time: 2021-05-19 19:38:56.009100, elapsed time: 0:00:00.032600
+generation_i: 49, end time: 2021-05-19 19:38:56.068503, elapsed time: 0:00:00.059403
