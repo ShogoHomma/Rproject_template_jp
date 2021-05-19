@@ -85,7 +85,7 @@ class SaveData:
         self.time_stamp_list = np.empty((11), dtype = 'object')
         self.time_stamp_list[0] = self.time_stamp_now
         
-        self.time_stamp_check = np.linspace(0, PopSize, num = 10, dtype = 'int') # どのタイミングで時間を記録するかのリスト
+        self.time_stamp_check = np.linspace(0, PopSize-1, num = 11, dtype = 'int') # どのタイミングで時間を記録するかのリスト, 0を含めて11分割する
         
         
         # --- create directory name --- #
@@ -146,12 +146,12 @@ class SaveData:
         
     def writeElapsedTime(self, pop_i):
         """
-        全体（エージェント or 世代）の10%が終わるごとに、経過時間を記録する
+        全体（エージェント）の10%が終わるごとに、経過時間を記録する
         """
         
-        for check_i in range(1, 10):
+        for check_i in range(1, 11):
             
-            if pop_i == self.time_stamp_check[check_i]: # self.time_stamp_checkにあれば、記録を開始する
+            if pop_i == self.time_stamp_check[check_i]: # pop_iが、self.time_stamp_checkにあれば、記録を開始する
                 
                 self.time_stamp_now = datetime.datetime.now()
                 self.time_stamp_list[check_i] = self.time_stamp_now
