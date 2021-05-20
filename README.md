@@ -306,7 +306,7 @@ generate_DummyData_RL.R
 
 
 
-```{r}
+```r
 library(tidyverse)
 ```
 
@@ -347,7 +347,7 @@ library(tidyverse)
     
     
 
-```{r}
+```r
 ​```{r, code = readLines(関数のパス)}
 ​```
 ```
@@ -391,7 +391,7 @@ library(tidyverse)
   - purrr::map(list, function) は、list (or vector) を順番にfunctionに適用し、その結果をlist形式で返す関数です。
   - そのため、データは事前にリストに分割しておく必要があります。
 
-```{r}
+```r
 data_list <- 
 	data %>%
 	dplyr::group_split(iter_group) # 繰り返したいグループで分割し、リストにする
@@ -405,7 +405,7 @@ g[[1]] # 1つ目の画像を表示する
 
 - 画像の保存もまとめてできる
 
-```{r}
+```r
 name_vector <- c(1, 2, 3, 4, 5)
 purrr::walk2(name_vector, g, ~ggsave(filename = paste0("plot", .x, ".png")), plot = .y)
 # walkはmapの返り値がないバージョン
@@ -435,7 +435,7 @@ Rmarkdownファイルの基本的な構成について
 
 
 
-```{r}
+```r
 sessionInfo()
 ```
 
@@ -462,7 +462,7 @@ sessionInfo()
 
 各Run_\** .R ファイルでは、モデルごとに1つのセクションが設けられている
 
-```{r}
+```r
 # ------ basic_RL model ----------
 
 ## 上のようにセクションを区切る。Rstudioでは目次が生成される。
