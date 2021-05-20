@@ -55,7 +55,7 @@ class SaveData:
     def __init__(self, dir_path):
         
         """
-        Parameters
+        Attributes
         -----------
         path : str
             シミュレーションの結果を保存するディレクトリの作成先
@@ -203,7 +203,7 @@ class Agent:
     def __init__(self, ID, Trial_N):
         
         """
-        Parameters
+       Attributes
         -----------
         ID : integer
             エージェントのID番号

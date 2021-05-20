@@ -51,7 +51,7 @@ class SaveData:
     def __init__(self, dir_path):
         
         """
-        Parameters
+        Attributes
         -----------
         path : str
             シミュレーションの結果を保存するディレクトリの作成先
@@ -90,6 +90,7 @@ class SaveData:
         self.output_agent = np.empty((Generation*N_pop, len(self.header_agent)), dtype='object')
         self.output_generation = np.empty((Generation, len(self.header_generation)))
         
+        # variables for writing elapsed time
         self.time_stamp_now = datetime.datetime.now()
         self.time_stamp_list = np.empty((11), dtype = 'object')
         self.time_stamp_list[0] = self.time_stamp_now
@@ -112,7 +113,7 @@ class SaveData:
         self.dir_name = self.dir_path + "_".join(dir_name_list)
         self.param_info_path = self.dir_name + "/_Parameters_info.txt"
         
-        # ディレクトリを作成する
+        # 保存用のディレクトリを作成する
         if os.path.exists(self.dir_name):
             pass
         else:
@@ -267,7 +268,7 @@ class Agent:
     def __init__(self, ID):
         
         """
-        Parameters
+        Attributes
         -----------
         ID : integer
             エージェントのID番号
@@ -458,9 +459,9 @@ Run PGG Simulation
 save_data_path = "../Data/PGG_Evo/" # Simulation_Codeディレクトリから見たパス
 
 # SaveDataのインスタンスを作成
-save_data = SaveData(save_data_path)
-save_data.writeParametersInfo(p_dict)
-save_data.createFile()
+save_data = SaveData(save_data_path) 
+save_data.writeParametersInfo(p_dict) # シミュレーションのパラメータの情報を.txtで書き出す
+save_data.createFile() # 保存用のcsvファイルを作成
 
 # Agentのインスタンス配列の作成
 agent = [Agent(ID = pop_i) for pop_i in range(N_pop)]
@@ -476,15 +477,15 @@ for generation_i in range(Generation):
     
     new_agent = naturalSelection(agent) # 自然淘汰
     
-    # -- ここで記録する--- # 
+    # --- ここで記録する--- # 
     save_data.recordData_generation(agent, generation_i)
     save_data.recordData_agent(agent, generation_i, new_agent)
-    # -- ---- --- --- # 
+    # --- ---- --- --- --- --- --- # 
     
     mutation(new_agent) # 突然変異
     
     agent = copy.deepcopy(new_agent) # 次世代のポピュレーション
-    random.shuffle(agent)
+    random.shuffle(agent) # agentをシャッフルする
     
     save_data.writeElapsedTime(generation_i) # 終了時間と経過時間を書き出す
     
