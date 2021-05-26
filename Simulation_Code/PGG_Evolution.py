@@ -37,7 +37,7 @@ p_dict = {
 #%%
 
 """
-Define Classes & Methods
+Define Classes
 """
 
 # in order to learn how to write docstring, 

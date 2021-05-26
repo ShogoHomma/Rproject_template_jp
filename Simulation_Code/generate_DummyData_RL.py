@@ -41,7 +41,7 @@ p_dict = {
 #%%
 
 """
-Define Classes & Methods
+Define Classes
 """
 
 # in order to learn how to write docstring, 
@@ -315,7 +315,7 @@ def initializeAgent(agent):
         
 def assignParameters(agent):
     """
-    全てのAgentに遺伝子を割り当てる
+    全てのAgentにパラメータを割り当てる
     """
     
     para_list = list(itertools.product(alpha, beta)) # 直積のリストを作成
@@ -343,7 +343,7 @@ save_data.createFile()
 # Agentのインスタンス配列を作成
 agent = [Agent(ID = pop_i, Trial_N = Trial_N) for pop_i in range(PopSize)]
 
-initializeAgent(agent) # インスタンスの初期化
+initializeAgent(agent) # インスタンスの初期化（冗長かも）
 assignParameters(agent) # パラメータのセット
 
 for pop_i in range(PopSize):
