@@ -14,7 +14,7 @@ fit_basicRL <- function(data_path, stan_model, save_path, stan_set) {
   # matrix[T, N] Reward;
   
   # Choice matrix
-  ## row: ID, column: trial
+  ## row: ID, column: trial # 
   data_dfs %>% 
     tidyr::pivot_wider(id_cols = ID, names_from = Trial, values_from = Choice) %>% 
     dplyr::select(-ID) %>% 
@@ -22,7 +22,7 @@ fit_basicRL <- function(data_path, stan_model, save_path, stan_set) {
     Choice_m 
   
   # Reward matrix
-  ## row: trial, column: ID
+  ## row: trial, column: ID # matrixは列優先なので、転置する
   data_dfs %>% 
     tidyr::pivot_wider(id_cols = ID, names_from = Trial, values_from = Reward) %>% 
     dplyr::select(-ID) %>% 
