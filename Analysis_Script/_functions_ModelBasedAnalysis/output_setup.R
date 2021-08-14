@@ -3,7 +3,7 @@
 #library(tidyverse)
 #library(here)
 
-output_setup <- function(output_path, stan_name, dir_name, fit_number) {
+output_setup <- function(output_path, stan_name, fit_number, dir_name) {
   
   if (str_detect(stan_name, pattern = "\\.stan") == TRUE) { # .stanが含まれている場合
     model_name <- stan_name %>% str_split(pattern = "\\.stan") %>% .[[1]] %>% .[1]

@@ -1,4 +1,4 @@
-# stan.objを読み込んで、posteriorの画像を.pngとして出力する
+# stan.objを読み込んで、posteriorの画像を.pngとして出力し、保存する
 
 #library(tidyverse)
 #library(here)

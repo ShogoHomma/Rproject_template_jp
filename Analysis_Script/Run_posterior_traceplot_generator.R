@@ -26,11 +26,11 @@ fit_number <- "fit01"
 stanfit_pattern <- "stanfit.obj"
 
 # 出力の保存先を作成 & 取得
-save_path_posterior <- output_setup(output_path, stan_name, "posterior", fit_number)
-save_path_traceplot <- output_setup(output_path, stan_name, "traceplot", fit_number)
+save_path_posterior <- output_setup(output_path, stan_name, fit_number, "posterior")
+save_path_traceplot <- output_setup(output_path, stan_name, fit_number, "traceplot")
 
 # stan.objのパスの取得
-target_stanfit <- make_DataPath(output_path, "basic_RL", "fit01", stanfit_pattern)
+target_stanfit <- make_DataPath(output_path, stan_name, fit_number, stanfit_pattern)
 
 # posterior & traceplotの保存
 save_posterior_basicRL(target_stanfit, save_path_posterior)

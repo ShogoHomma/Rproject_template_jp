@@ -1,4 +1,4 @@
-# 参加者ひとり一人について、traceplotの画像を.pngとして出力する
+# 参加者ひとり一人について、traceplotの画像を作成する
 
 #library(tidyverse)
 #library(here)

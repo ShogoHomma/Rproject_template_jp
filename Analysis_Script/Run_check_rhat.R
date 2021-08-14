@@ -26,10 +26,10 @@ fit_number <- "fit01"
 stanfit_pattern <- "stanfit.obj"
 
 # 出力の保存先を作成 & 取得
-save_path <- output_setup(output_path, stan_name, "Rhat", fit_number)
+save_path <- output_setup(output_path, stan_name, fit_number, "Rhat")
 
 # stan.objのパスの取得
-target_stanfit <- make_DataPath(output_path, "basic_RL", "fit01", stanfit_pattern)
+target_stanfit <- make_DataPath(output_path, stan_name, fit_number, stanfit_pattern)
 
 # Rhatの確認
 check_Rhat(target_stanfit, save_path)
