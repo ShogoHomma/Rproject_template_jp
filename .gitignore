@@ -8,7 +8,7 @@
 !/Output/.gitkeep
 # posteriorとtraceplotフォルダは空にする
 /posterior/*
-!/postrior/.gitkeep
+!/posterior/.gitkeep
 /traceplot/*
 !/traceplot/.gitkeep
 # rmarkdownの_cacheフォルダを無視する

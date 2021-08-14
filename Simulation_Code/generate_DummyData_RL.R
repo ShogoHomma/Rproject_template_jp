@@ -59,6 +59,7 @@ sbj_params_set <- # パラメータの全ての組み合わせをdfにする
     ID = 1:nrow(.)
   )
 
+# 要素が0で埋まった空の行列を作成する
 Prob_Choices <- matrix(0, nrow = nrow(sbj_params_set), ncol = trial_N)
 
 Choices <- matrix(0, nrow = nrow(sbj_params_set), ncol = trial_N)
@@ -143,6 +144,7 @@ output_df <-
     Op2_p = Option2_p_reward
   ) %>% 
   dplyr::select(ID, everything())
+
 
 writeToCSV(output_df, sbj_params_set, task_params_set)
 
