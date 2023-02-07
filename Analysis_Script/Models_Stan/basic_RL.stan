@@ -15,7 +15,7 @@ data {
 parameters {
   
   vector<lower=0, upper=1>[N] alpha; // learning rate
-  vector<lower=0>[N] beta; // inverse temperature
+  vector<lower=0, upper=10>[N] beta; // inverse temperature
   
 }
 
@@ -47,7 +47,7 @@ model {
   }
   
   // prior (vectorized)
-	to_vector(alpha) ~ normal(0.5, 100);
-	to_vector(beta) ~ cauchy(0, 100);
+	to_vector(alpha) ~ normal(0.5, 10);
+	to_vector(beta) ~ cauchy(0, 10);
   
 }

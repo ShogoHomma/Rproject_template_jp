@@ -65,8 +65,9 @@ knitr::opts_chunk$set(
 
 ```{r setup-output-path}
 # 出力の保存先のパスを設定
-# dir.create(here("Output", "Figures_DummyData")) # なければ、フォルダを作成
+
 output_path <- here("Output", "Figures_DummyData")
+# dir.create(output_path) # なければ、フォルダを作成
 ```
 
 ## データの読み込み
@@ -114,6 +115,27 @@ df_est_params <- readr::read_csv(here("Data", "Models_Results", "basic_RL", "fit
   ) %>% 
   dplyr::filter(para %in% c("alpha", "beta")) %>% 
   tidyr::pivot_wider(id_cols = c("ID"), names_from = para, values_from = mean) %>% 
+  dplyr::rename(
+    fit_alpha = alpha,
+    fit_beta = beta
+  )
+```
+
+
+```{r}
+# Dummyデータとパラメータ推定の2つを結合
+
+options(readr.num_columns = 0) # readrのメッセージがうるさいので消す
+
+df_dummy_RL <- readr::read_csv(here("Data", "DummyData_RL", "DummyData_RL_Random_trialN200_1Op0.7_2Op0.3_agentN200_20210707181150", "RL_trial.csv"))
+
+
+df_est_params <- readr::read_csv(here("Data", "Models_Results", "basic_RL", "fit04", "estimated_parameter", "est_parameter.csv")) %>% 
+  dplyr::rename(
+    ID = p_index
+  ) %>% 
+  dplyr::filter(para %in% c("alpha", "beta")) %>% 
+  tidyr::pivot_wider(id_cols = c("ID"), names_from = para, values_from = mode) %>% 
   dplyr::rename(
     fit_alpha = alpha,
     fit_beta = beta
@@ -286,6 +308,49 @@ purrr::walk2(1:nrow(plot_params), g,
 
 
 ![](`r here(output_path, "CProb", "CProb_full_Op0.6.png")`)
+
+
+
+```{r}
+# DummyDataとParameterのdfを結合する
+df_RL <- 
+  df_dummy_RL %>% 
+  dplyr::full_join(df_est_params, by = "ID") %>% 
+  dplyr::filter(trial == 1)
+  
+df_RL %>% 
+  ggplot(aes(x = alpha, y = fit_alpha)) + geom_point() + 
+  my_theme2
+
+cor(df_RL$alpha, df_RL$fit_alpha)
+
+df_RL %>% 
+  ggplot(aes(x = beta, y = fit_beta)) + geom_point() + 
+  my_theme2
+
+cor(df_RL$beta, df_RL$fit_beta)
+
+
+```
+
+
+
+# 分析2：PGGの進化シミュレーション
+
+```{r}
+DataDir <- "Data"
+DataDir_sub <- "PGG_Evo"
+
+target_csv <- make_DataPath(DataDir, DataDir_sub, "", "_generation.csv")
+df_PGG <- purrr::map_dfr(target_csv, readr::read_csv)
+```
+
+
+```{r}
+df_PGG %>% 
+  tidyr::pivot_longer(cols = -Generation, names_to = c("f", "Strategy"), values_to = "frequency", names_sep = "_") %>% 
+  ggplot(aes(x = Generation, y = frequency, color = Strategy)) + geom_line()
+```
 
 
 # SessionInfo
