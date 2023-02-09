@@ -31,7 +31,7 @@ output_csv_name <- "est_parameter.csv"
 save_path <- output_setup(output_path, stan_name, fit_number, "estimated_parameter") 
 
 # stan.objのパスを取得
-target_stanfit <- make_DataPath(output_path, stan_name, fit_number, stanfit_pattern)
+target_stanfit <- make_filepath(output_path, stan_name, fit_number, stanfit_pattern)
 
 # csvの作成
 save_params_csv_basicRL(target_stanfit, save_path, output_csv_name)

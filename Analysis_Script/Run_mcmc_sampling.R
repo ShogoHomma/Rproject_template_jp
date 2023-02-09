@@ -1,57 +1,62 @@
 # stanをコンパイルし、mcmcを実行するファイル
 
 library(tidyverse)
-library(rstan)
-library(here) 
+library(here)
+library(cmdstan)
+library(bayesplot)
+library(tidybayes)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 # 関数の読み込み
-model_functions_path <- here("Analysis_Script", "_functions_ModelBasedAnalysis")
-model_functions <- here(model_functions_path, dir(model_functions_path))
-purrr::walk(model_functions, ~source(.x))
-
-common_functions_path <- here("Analysis_Script", "_functions_common")
+common_functions_path <- here("Rfunctions", "common")
 common_functions <- here(common_functions_path, dir(common_functions_path))
 purrr::walk(common_functions, ~source(.x))
 
+model_functions_path <- here("Rfunctions", "model_analysis")
+model_functions <- here(model_functions_path, dir(model_functions_path))
+purrr::walk(model_functions, ~source(.x))
+
 # フィッティング結果の出力先
-output_path <- here("Data", "Models_Results")
+recovery_output_path <- here("Model_Simulation_Recovery", "Fit_Results")
+expfit_output_path <- here("FitResults_ExpData")
 
 
-### ------ Run Model-Fitting ----- ###
-
-# ------ basic_RL model ----------
+# ------ basicRL model ----------
 
 # * fit01 -------
 
-stan_name <- "basic_RL.stan"
-fit_number <- "fit01"
+stan_name <- "basicRL.stan"
+fit_index <- "fit01"
 
 # ファイルの保存先を作成 & 取得
-save_path <- output_setup(output_path, stan_name, fit_number, "stanfit") 
+save_path <- output_setup(expfit_output_path, stan_name, fit_index) 
 
 # データパスの取得
-target_data <- make_DataPath("Data", "DummyData_RL", "_20210322151628", ".csv")
+dir_list <- list("Simulated_Data", "basicRL")
+target_data_path <- make_filepath(dir_list, "_20210322151628", ".csv")
 
-# コンパイル & MCMCの実行
-
+# set cmdstanr arguments
 stan_set <- 
   list(
-    seed = 123, 
-    chains = 4, 
-    iter = 2000, 
-    warmup = 1000,
-    init = "random",
+    seed = 123,
+    init = NULL,
+    chains = 4,
+    parallel_chains
+    iter_sampling = 2000,
+    iter_warmup = 1000,
+    adapt_delta = 0.95
     thin = 1,
     cores = 4
   )
 
-stan_path <- here("Analysis_Script", "Models_Stan", stan_name)
-stan_model <- rstan::stan_model(file = stan_path) # コンパイル (あとで rstan::samplingでモデルを実行)
+# get .stan path
+stanfile_path <- here("Model_StanFiles", stan_name)
 
-fit_basicRL(target_data, stan_model, save_path, stan_set)
+# compile
+mod <- cmdstanr::cmdstan_model(stanfile_path)
 
-
+# sampling
+fit_basicRL(target_data_path, mod, save_path, stan_set)
 
 

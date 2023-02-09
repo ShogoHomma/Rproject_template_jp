@@ -31,17 +31,20 @@ library(patchwork) # recommend # see https://qiita.com/nozma/items/4512623bea296
 ## 関数の読み込み
 
 ```{r setup-load-functions, results='hide'}
-# よく使う関数は、_functions_commonフォルダに作成
-# プロジェクトで使う関数は、_functions_projectフォルダに作成し、source()で読み込むこと
-common_functions_path <- here("Analysis_Script", "_functions_common")
+# よく使う関数は、Rfunctionsフォルダに作成 source()で読み込むこと
+# source()は複数の関数を読み込めないので、purrr::walk()を使う
+# purrr::walk()は、vector (or list) を関数に適用しながらinvisible返しする、purrr::mapの亜種
+
+# プロジェクトで使う関数: Rfunctions/projec
+
+common_functions_path <- here("Rfunctions", "common")
 common_functions <- here(common_functions_path, dir(common_functions_path))
 purrr::walk(common_functions, ~source(.x))
 
-project_functions_path <- here("Analysis_Script", "_functions_project")
+project_functions_path <- here("Rfunctions", "project")
 project_functions <- here(project_functions_path, dir(project_functions_path))
 purrr::walk(project_functions, ~source(.x))
-# source()は複数の関数を読み込めないので、purrr::walk()を使う
-# purrr::walk()は、vector (or list) を関数に適用しながらinvisible返しする、purrr::mapの亜種
+
 ```
 
 ## メタ情報の設定
@@ -51,16 +54,15 @@ purrr::walk(project_functions, ~source(.x))
 # 特に、cacheを _cacheフォルダに生成するための設定
 # このchunkは手動でrunしないこと。エラーが出る。
 
-rmarkdown_dir <- "Analysis_Script"
+rmd_dir <- "Analysis_Script"
 cache_dir <- "_cache" # cacheの保存ディレクトリ名
-input <- knitr::current_input() %>% str_split(pattern = "\\.Rmd") %>% .[[1]] %>% .[1] # 拡張子の前だけ取り出す # 返り値がリストになっているのでその中身を取り出す
+rmd_input <- knitr::current_input() %>% str_split(pattern = "\\.Rmd") %>% .[[1]] %>% .[1] # 拡張子の前だけ取り出す # 返り値がリストになっているのでその中身を取り出す
 
 knitr::opts_chunk$set(
-  echo=TRUE, comment="", warning=FALSE, message=FALSE, fig.align="center",
-  
-  cache.path = here(rmarkdown_dir, cache_dir, input %&% "_cache", "html") %&% "/", 
-  fig.path = here(rmarkdown_dir, cache_dir, input %&% "_files", "figure-html") %&% "/"
-  )
+  echo = TRUE, comment = "", warning = FALSE, message = FALSE, fig.align = "center",
+  cache.path = paste0(here(rmd_dir, cache_dir, paste0(rmd_input, "_cache"), "html"), "/"), 
+  fig.path = paste0(here(rmd_dir, cache_dir, paste0(rmd_input, "_files"), "figure-html"), "/")
+)
 ```
 
 ```{r setup-output-path}
@@ -69,6 +71,7 @@ knitr::opts_chunk$set(
 output_path <- here("Output", "Figures_DummyData")
 # dir.create(output_path) # なければ、フォルダを作成
 ```
+
 
 ## データの読み込み
 
