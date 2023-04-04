@@ -45,6 +45,10 @@ project_functions_path <- here("Rfunctions", "project")
 project_functions <- here(project_functions_path, dir(project_functions_path))
 purrr::walk(project_functions, ~source(.x))
 
+model_functions_path <- here("Rfunctions", "model_analysis")
+model_functions <- here(model_functions_path, dir(model_functions_path))
+purrr::walk(model_functions, ~source(.x))
+
 ```
 
 ## メタ情報の設定
@@ -97,22 +101,21 @@ output_path <- here("Output", "Figures_DummyData")
 # テストとして、それらを読み込んでデータフレームにする。  
 # ディレクトリがなければ、generate_DummyData_RL.R or generate_DummyData_RL.py のどちらかを実行してcsvを生成しておく。
 
-options(readr.num_columns = 0) # readrのメッセージがうるさいので消す
-
 DataDir <- "Data"
 DataDir_sub <- "DummyData_RL"
 
 target_csv <- make_DataPath(DataDir, DataDir_sub, ".", ".csv")
-df_dummy_RL <- purrr::map_dfr(target_csv, readr::read_csv)
+df_dummy_RL <- purrr::map_dfr(target_csv, ~readr::read_csv(.x, show_col_types = FALSE))
 # 複数のcsv（列構造が同じもの）は、purrr::map_dfr()がrapid & beautifulで良い
 # csvが巨大な場合には、purrr::map_dfr(target_csv, data.table::fread)を実行すると良い
 ```
 
 
 ```{r}
-options(readr.num_columns = 0) # readrのメッセージがうるさいので消す
+target_file_path_params <- here("Data", "Models_Results", "basic_RL", "fit01", "estimated_parameter", "est_parameter.csv")
 
-df_est_params <- readr::read_csv(here("Data", "Models_Results", "basic_RL", "fit01", "estimated_parameter", "est_parameter.csv")) %>% 
+df_est_params <- 
+  readr::read_csv(target_file_path_params, show_col_types = FALSE) %>% 
   dplyr::rename(
     ID = p_index
   ) %>% 
@@ -128,12 +131,13 @@ df_est_params <- readr::read_csv(here("Data", "Models_Results", "basic_RL", "fit
 ```{r}
 # Dummyデータとパラメータ推定の2つを結合
 
-options(readr.num_columns = 0) # readrのメッセージがうるさいので消す
+target_file_path_data <- here("Data", "DummyData_RL", "DummyData_RL_Random_trialN200_1Op0.7_2Op0.3_agentN200_20210707181150", "RL_trial.csv")
 
-df_dummy_RL <- readr::read_csv(here("Data", "DummyData_RL", "DummyData_RL_Random_trialN200_1Op0.7_2Op0.3_agentN200_20210707181150", "RL_trial.csv"))
+target_file_path_params <- here("Data", "Models_Results", "basic_RL", "fit04", "estimated_parameter", "est_parameter.csv")
 
+df_dummy_RL <- readr::read_csv(target_file_path_data, show_col_types = FALSE)
 
-df_est_params <- readr::read_csv(here("Data", "Models_Results", "basic_RL", "fit04", "estimated_parameter", "est_parameter.csv")) %>% 
+df_est_params <- readr::read_csv(target_file_path_params, show_col_types = FALSE) %>% 
   dplyr::rename(
     ID = p_index
   ) %>% 
